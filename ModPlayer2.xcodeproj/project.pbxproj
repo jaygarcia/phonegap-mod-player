@@ -1,0 +1,534 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		71D2D49F1980041000E8916E /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 71D2D49E1980041000E8916E /* Foundation.framework */; };
+		71D2D4A11980041000E8916E /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 71D2D4A01980041000E8916E /* CoreGraphics.framework */; };
+		71D2D4A31980041000E8916E /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 71D2D4A21980041000E8916E /* UIKit.framework */; };
+		71D2D4A91980041000E8916E /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 71D2D4A71980041000E8916E /* InfoPlist.strings */; };
+		71D2D4AB1980041000E8916E /* main.mm in Sources */ = {isa = PBXBuildFile; fileRef = 71D2D4AA1980041000E8916E /* main.mm */; };
+		71D2D4AF1980041000E8916E /* MCAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 71D2D4AE1980041000E8916E /* MCAppDelegate.m */; };
+		71D2D4B21980041000E8916E /* Main_iPhone.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 71D2D4B01980041000E8916E /* Main_iPhone.storyboard */; };
+		71D2D4B51980041000E8916E /* Main_iPad.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 71D2D4B31980041000E8916E /* Main_iPad.storyboard */; };
+		71D2D4B81980041000E8916E /* MCViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 71D2D4B71980041000E8916E /* MCViewController.m */; };
+		71D2D4BA1980041000E8916E /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 71D2D4B91980041000E8916E /* Images.xcassets */; };
+		71D2D4C11980041000E8916E /* XCTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 71D2D4C01980041000E8916E /* XCTest.framework */; };
+		71D2D4C21980041000E8916E /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 71D2D49E1980041000E8916E /* Foundation.framework */; };
+		71D2D4C31980041000E8916E /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 71D2D4A21980041000E8916E /* UIKit.framework */; };
+		71D2D4CB1980041000E8916E /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 71D2D4C91980041000E8916E /* InfoPlist.strings */; };
+		71D2D4CD1980041000E8916E /* ModPlayer2Tests.m in Sources */ = {isa = PBXBuildFile; fileRef = 71D2D4CC1980041000E8916E /* ModPlayer2Tests.m */; };
+		71D2D4D9198011C300E8916E /* libmodplug.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 71D2D4D7198011C300E8916E /* libmodplug.a */; };
+		71D2D4DD1980120900E8916E /* ModPlayer.m in Sources */ = {isa = PBXBuildFile; fileRef = 71D2D4DC1980120900E8916E /* ModPlayer.m */; };
+		71D2D4E21980132600E8916E /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 71D2D4DF1980132600E8916E /* AudioToolbox.framework */; };
+		71D2D4E41980132600E8916E /* CoreAudio.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 71D2D4E11980132600E8916E /* CoreAudio.framework */; };
+		71D2D4F219803BE000E8916E /* mods in Resources */ = {isa = PBXBuildFile; fileRef = 71D2D4F119803BE000E8916E /* mods */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		71D2D4C41980041000E8916E /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 71D2D4931980041000E8916E /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 71D2D49A1980041000E8916E;
+			remoteInfo = ModPlayer2;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		71D2D49B1980041000E8916E /* ModPlayer2.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ModPlayer2.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		71D2D49E1980041000E8916E /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
+		71D2D4A01980041000E8916E /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
+		71D2D4A21980041000E8916E /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
+		71D2D4A61980041000E8916E /* ModPlayer2-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "ModPlayer2-Info.plist"; sourceTree = "<group>"; };
+		71D2D4A81980041000E8916E /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		71D2D4AA1980041000E8916E /* main.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = main.mm; sourceTree = "<group>"; };
+		71D2D4AC1980041000E8916E /* ModPlayer2-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "ModPlayer2-Prefix.pch"; sourceTree = "<group>"; };
+		71D2D4AD1980041000E8916E /* MCAppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MCAppDelegate.h; sourceTree = "<group>"; };
+		71D2D4AE1980041000E8916E /* MCAppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MCAppDelegate.m; sourceTree = "<group>"; };
+		71D2D4B11980041000E8916E /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main_iPhone.storyboard; sourceTree = "<group>"; };
+		71D2D4B41980041000E8916E /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main_iPad.storyboard; sourceTree = "<group>"; };
+		71D2D4B61980041000E8916E /* MCViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MCViewController.h; sourceTree = "<group>"; };
+		71D2D4B71980041000E8916E /* MCViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MCViewController.m; sourceTree = "<group>"; };
+		71D2D4B91980041000E8916E /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
+		71D2D4BF1980041000E8916E /* ModPlayer2Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ModPlayer2Tests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		71D2D4C01980041000E8916E /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = Library/Frameworks/XCTest.framework; sourceTree = DEVELOPER_DIR; };
+		71D2D4C81980041000E8916E /* ModPlayer2Tests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "ModPlayer2Tests-Info.plist"; sourceTree = "<group>"; };
+		71D2D4CA1980041000E8916E /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		71D2D4CC1980041000E8916E /* ModPlayer2Tests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ModPlayer2Tests.m; sourceTree = "<group>"; };
+		71D2D4D7198011C300E8916E /* libmodplug.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libmodplug.a; sourceTree = "<group>"; };
+		71D2D4D8198011C300E8916E /* modplug.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = modplug.h; sourceTree = "<group>"; };
+		71D2D4DB1980120900E8916E /* ModPlayer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ModPlayer.h; sourceTree = "<group>"; };
+		71D2D4DC1980120900E8916E /* ModPlayer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ModPlayer.m; sourceTree = "<group>"; };
+		71D2D4DF1980132600E8916E /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = System/Library/Frameworks/AudioToolbox.framework; sourceTree = SDKROOT; };
+		71D2D4E01980132600E8916E /* AudioUnit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioUnit.framework; path = System/Library/Frameworks/AudioUnit.framework; sourceTree = SDKROOT; };
+		71D2D4E11980132600E8916E /* CoreAudio.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreAudio.framework; path = System/Library/Frameworks/CoreAudio.framework; sourceTree = SDKROOT; };
+		71D2D4F119803BE000E8916E /* mods */ = {isa = PBXFileReference; lastKnownFileType = folder; path = mods; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		71D2D4981980041000E8916E /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				71D2D4E21980132600E8916E /* AudioToolbox.framework in Frameworks */,
+				71D2D4E41980132600E8916E /* CoreAudio.framework in Frameworks */,
+				71D2D4A11980041000E8916E /* CoreGraphics.framework in Frameworks */,
+				71D2D4A31980041000E8916E /* UIKit.framework in Frameworks */,
+				71D2D4D9198011C300E8916E /* libmodplug.a in Frameworks */,
+				71D2D49F1980041000E8916E /* Foundation.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		71D2D4BC1980041000E8916E /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				71D2D4C11980041000E8916E /* XCTest.framework in Frameworks */,
+				71D2D4C31980041000E8916E /* UIKit.framework in Frameworks */,
+				71D2D4C21980041000E8916E /* Foundation.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		71D2D4921980041000E8916E = {
+			isa = PBXGroup;
+			children = (
+				71D2D4D61980041900E8916E /* lib */,
+				71D2D4A41980041000E8916E /* ModPlayer2 */,
+				71D2D4C61980041000E8916E /* ModPlayer2Tests */,
+				71D2D49D1980041000E8916E /* Frameworks */,
+				71D2D49C1980041000E8916E /* Products */,
+				71D2D4F119803BE000E8916E /* mods */,
+			);
+			sourceTree = "<group>";
+		};
+		71D2D49C1980041000E8916E /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				71D2D49B1980041000E8916E /* ModPlayer2.app */,
+				71D2D4BF1980041000E8916E /* ModPlayer2Tests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		71D2D49D1980041000E8916E /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				71D2D4DF1980132600E8916E /* AudioToolbox.framework */,
+				71D2D4E01980132600E8916E /* AudioUnit.framework */,
+				71D2D4E11980132600E8916E /* CoreAudio.framework */,
+				71D2D49E1980041000E8916E /* Foundation.framework */,
+				71D2D4A01980041000E8916E /* CoreGraphics.framework */,
+				71D2D4A21980041000E8916E /* UIKit.framework */,
+				71D2D4C01980041000E8916E /* XCTest.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		71D2D4A41980041000E8916E /* ModPlayer2 */ = {
+			isa = PBXGroup;
+			children = (
+				71D2D4AD1980041000E8916E /* MCAppDelegate.h */,
+				71D2D4AE1980041000E8916E /* MCAppDelegate.m */,
+				71D2D4B01980041000E8916E /* Main_iPhone.storyboard */,
+				71D2D4B31980041000E8916E /* Main_iPad.storyboard */,
+				71D2D4B61980041000E8916E /* MCViewController.h */,
+				71D2D4B71980041000E8916E /* MCViewController.m */,
+				71D2D4B91980041000E8916E /* Images.xcassets */,
+				71D2D4A51980041000E8916E /* Supporting Files */,
+				71D2D4DB1980120900E8916E /* ModPlayer.h */,
+				71D2D4DC1980120900E8916E /* ModPlayer.m */,
+			);
+			path = ModPlayer2;
+			sourceTree = "<group>";
+		};
+		71D2D4A51980041000E8916E /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				71D2D4A61980041000E8916E /* ModPlayer2-Info.plist */,
+				71D2D4A71980041000E8916E /* InfoPlist.strings */,
+				71D2D4AA1980041000E8916E /* main.mm */,
+				71D2D4AC1980041000E8916E /* ModPlayer2-Prefix.pch */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		71D2D4C61980041000E8916E /* ModPlayer2Tests */ = {
+			isa = PBXGroup;
+			children = (
+				71D2D4CC1980041000E8916E /* ModPlayer2Tests.m */,
+				71D2D4C71980041000E8916E /* Supporting Files */,
+			);
+			path = ModPlayer2Tests;
+			sourceTree = "<group>";
+		};
+		71D2D4C71980041000E8916E /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				71D2D4C81980041000E8916E /* ModPlayer2Tests-Info.plist */,
+				71D2D4C91980041000E8916E /* InfoPlist.strings */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		71D2D4D61980041900E8916E /* lib */ = {
+			isa = PBXGroup;
+			children = (
+				71D2D4D7198011C300E8916E /* libmodplug.a */,
+				71D2D4D8198011C300E8916E /* modplug.h */,
+			);
+			name = lib;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		71D2D49A1980041000E8916E /* ModPlayer2 */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 71D2D4D01980041000E8916E /* Build configuration list for PBXNativeTarget "ModPlayer2" */;
+			buildPhases = (
+				71D2D4971980041000E8916E /* Sources */,
+				71D2D4981980041000E8916E /* Frameworks */,
+				71D2D4991980041000E8916E /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = ModPlayer2;
+			productName = ModPlayer2;
+			productReference = 71D2D49B1980041000E8916E /* ModPlayer2.app */;
+			productType = "com.apple.product-type.application";
+		};
+		71D2D4BE1980041000E8916E /* ModPlayer2Tests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 71D2D4D31980041000E8916E /* Build configuration list for PBXNativeTarget "ModPlayer2Tests" */;
+			buildPhases = (
+				71D2D4BB1980041000E8916E /* Sources */,
+				71D2D4BC1980041000E8916E /* Frameworks */,
+				71D2D4BD1980041000E8916E /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				71D2D4C51980041000E8916E /* PBXTargetDependency */,
+			);
+			name = ModPlayer2Tests;
+			productName = ModPlayer2Tests;
+			productReference = 71D2D4BF1980041000E8916E /* ModPlayer2Tests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		71D2D4931980041000E8916E /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				CLASSPREFIX = MC;
+				LastUpgradeCheck = 0510;
+				ORGANIZATIONNAME = "Modus Create";
+				TargetAttributes = {
+					71D2D4BE1980041000E8916E = {
+						TestTargetID = 71D2D49A1980041000E8916E;
+					};
+				};
+			};
+			buildConfigurationList = 71D2D4961980041000E8916E /* Build configuration list for PBXProject "ModPlayer2" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 71D2D4921980041000E8916E;
+			productRefGroup = 71D2D49C1980041000E8916E /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				71D2D49A1980041000E8916E /* ModPlayer2 */,
+				71D2D4BE1980041000E8916E /* ModPlayer2Tests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		71D2D4991980041000E8916E /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				71D2D4B51980041000E8916E /* Main_iPad.storyboard in Resources */,
+				71D2D4BA1980041000E8916E /* Images.xcassets in Resources */,
+				71D2D4F219803BE000E8916E /* mods in Resources */,
+				71D2D4B21980041000E8916E /* Main_iPhone.storyboard in Resources */,
+				71D2D4A91980041000E8916E /* InfoPlist.strings in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		71D2D4BD1980041000E8916E /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				71D2D4CB1980041000E8916E /* InfoPlist.strings in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		71D2D4971980041000E8916E /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				71D2D4AF1980041000E8916E /* MCAppDelegate.m in Sources */,
+				71D2D4B81980041000E8916E /* MCViewController.m in Sources */,
+				71D2D4AB1980041000E8916E /* main.mm in Sources */,
+				71D2D4DD1980120900E8916E /* ModPlayer.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		71D2D4BB1980041000E8916E /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				71D2D4CD1980041000E8916E /* ModPlayer2Tests.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		71D2D4C51980041000E8916E /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 71D2D49A1980041000E8916E /* ModPlayer2 */;
+			targetProxy = 71D2D4C41980041000E8916E /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin PBXVariantGroup section */
+		71D2D4A71980041000E8916E /* InfoPlist.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				71D2D4A81980041000E8916E /* en */,
+			);
+			name = InfoPlist.strings;
+			sourceTree = "<group>";
+		};
+		71D2D4B01980041000E8916E /* Main_iPhone.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				71D2D4B11980041000E8916E /* Base */,
+			);
+			name = Main_iPhone.storyboard;
+			sourceTree = "<group>";
+		};
+		71D2D4B31980041000E8916E /* Main_iPad.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				71D2D4B41980041000E8916E /* Base */,
+			);
+			name = Main_iPad.storyboard;
+			sourceTree = "<group>";
+		};
+		71D2D4C91980041000E8916E /* InfoPlist.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				71D2D4CA1980041000E8916E /* en */,
+			);
+			name = InfoPlist.strings;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		71D2D4CE1980041000E8916E /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 7.1;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		71D2D4CF1980041000E8916E /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = YES;
+				ENABLE_NS_ASSERTIONS = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 7.1;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		71D2D4D11980041000E8916E /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "ModPlayer2/ModPlayer2-Prefix.pch";
+				INFOPLIST_FILE = "ModPlayer2/ModPlayer2-Info.plist";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)",
+				);
+				OTHER_LDFLAGS = "";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				WRAPPER_EXTENSION = app;
+			};
+			name = Debug;
+		};
+		71D2D4D21980041000E8916E /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "ModPlayer2/ModPlayer2-Prefix.pch";
+				INFOPLIST_FILE = "ModPlayer2/ModPlayer2-Info.plist";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)",
+				);
+				OTHER_LDFLAGS = "";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				WRAPPER_EXTENSION = app;
+			};
+			name = Release;
+		};
+		71D2D4D41980041000E8916E /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/ModPlayer2.app/ModPlayer2";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(SDKROOT)/Developer/Library/Frameworks",
+					"$(inherited)",
+					"$(DEVELOPER_FRAMEWORKS_DIR)",
+				);
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "ModPlayer2/ModPlayer2-Prefix.pch";
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				INFOPLIST_FILE = "ModPlayer2Tests/ModPlayer2Tests-Info.plist";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TEST_HOST = "$(BUNDLE_LOADER)";
+				WRAPPER_EXTENSION = xctest;
+			};
+			name = Debug;
+		};
+		71D2D4D51980041000E8916E /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/ModPlayer2.app/ModPlayer2";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(SDKROOT)/Developer/Library/Frameworks",
+					"$(inherited)",
+					"$(DEVELOPER_FRAMEWORKS_DIR)",
+				);
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "ModPlayer2/ModPlayer2-Prefix.pch";
+				INFOPLIST_FILE = "ModPlayer2Tests/ModPlayer2Tests-Info.plist";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TEST_HOST = "$(BUNDLE_LOADER)";
+				WRAPPER_EXTENSION = xctest;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		71D2D4961980041000E8916E /* Build configuration list for PBXProject "ModPlayer2" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				71D2D4CE1980041000E8916E /* Debug */,
+				71D2D4CF1980041000E8916E /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		71D2D4D01980041000E8916E /* Build configuration list for PBXNativeTarget "ModPlayer2" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				71D2D4D11980041000E8916E /* Debug */,
+				71D2D4D21980041000E8916E /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		71D2D4D31980041000E8916E /* Build configuration list for PBXNativeTarget "ModPlayer2Tests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				71D2D4D41980041000E8916E /* Debug */,
+				71D2D4D51980041000E8916E /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 71D2D4931980041000E8916E /* Project object */;
+}
