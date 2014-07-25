@@ -14,6 +14,9 @@
     unsigned char *genVolData, *playVolData;
 	char *mp_data;
 	int numPatterns, numSamples, numInstr;
+    
+    ModPlug_Settings settings;
+
 }
 
 
@@ -34,16 +37,102 @@
     
     NSMutableArray *dirs = [self getModFileDirectories:@""];
     
-    NSString *firstDir = [dirs objectAtIndex:0];
+    NSString *firstDir = [dirs objectAtIndex:1];
     
     NSMutableArray *files = [self getFilesInDirectory:firstDir];
-    NSString *firstFile = [files objectAtIndex:0];
+    NSURL *fileUrl = [files objectAtIndex:3];
+    NSString *firstFile = [[fileUrl filePathURL] absoluteString];
+
+    firstFile = [[firstFile componentsSeparatedByString:@"%20"] componentsJoinedByString: @" "];
+    firstFile = [[firstFile componentsSeparatedByString:@"file://"] componentsJoinedByString: @""];
     
     
+    [self playFile:firstFile];
+
+
+//    NSLog(@"Here");
+}
+
+- (void) playFile:(NSString *) filePath {
+    ModPlug_GetSettings(&settings);
+
+
+//    settings.mFlags=MODPLUG_ENABLE_OVERSAMPLING;
+    
+//    	int mFlags;  /* One or more of the MODPLUG_ENABLE_* flags above, bitwise-OR'ed */
+	
+	/* Note that ModPlug always decodes sound at 44100kHz, 32 bit, stereo and then
+	 * down-mixes to the settings you choose. */
+//	int mChannels;       /* Number of channels - 1 for mono or 2 for stereo */
+//	int mBits;           /* Bits per sample - 8, 16, or 32 */
+//	int mFrequency;      /* Sampling rate - 11025, 22050, or 44100 */
+//	int mResamplingMode; /* One of MODPLUG_RESAMPLE_*, above */
+//
+//	int mStereoSeparation; /* Stereo separation, 1 - 256 */
+//	int mMaxMixChannels; /* Maximum number of mixing channels (polyphony), 32 - 256 */
+//	
+//	int mReverbDepth;    /* Reverb level 0(quiet)-100(loud)      */
+//	int mReverbDelay;    /* Reverb delay in ms, usually 40-200ms */
+//	int mBassAmount;     /* XBass level 0(quiet)-100(loud)       */
+//	int mBassRange;      /* XBass cutoff in Hz 10-100            */
+//	int mSurroundDepth;  /* Surround level 0(quiet)-100(heavy)   */
+//	int mSurroundDelay;  /* Surround delay in ms, usually 5-40ms */
+//	int mLoopCount;      /* Number of times to loop.  Zero prevents looping.
+//	                        -1 loops forever. */
+//    
+    
+    settings.mChannels=2;
+    settings.mBits=16;
+    settings.mFrequency=44100;
+    settings.mResamplingMode=MODPLUG_RESAMPLE_NEAREST;
+    settings.mReverbDepth=0;
+    settings.mReverbDelay=100;
+    settings.mBassAmount=0;
+    settings.mBassRange=50;
+    settings.mSurroundDepth=0;
+    settings.mSurroundDelay=10;
+    settings.mLoopCount=-1;
+    settings.mStereoSeparation=32;
+    
+    ModPlug_SetSettings(&settings);
+    
+    FILE *file;
+    char *fileData;
+    int fileSize;
+
+    const char* fil = [filePath cStringUsingEncoding:NSASCIIStringEncoding];
+    
+    file = fopen(fil, "rb");
+    
+    if (file == NULL) {
+      return;
+    }
+    
+    fseek(file, 0L, SEEK_END);
+    (fileSize) = ftell(file);
+    rewind(file);
+    fileData = (char*) malloc(fileSize);
+    
+    fread(fileData, fileSize, sizeof(char), file);
+    fclose(file);
+
+    ModPlugFile *mpFile;
+    
+    mpFile = ModPlug_Load(fileData, fileSize);
+    ModPlug_SetMasterVolume(mpFile, 128);
+    ModPlug_Seek(mpFile, 0);
     
     
-    NSLog(@"Here");
-   
+    const char *modName = ModPlug_GetName(mpFile);
+
+    /* Get the length of the mod, in milliseconds.  Note that this result is not always
+     * accurate, especially in the case of mods with loops. */
+    int len = ModPlug_GetLength(mpFile);
+
+    NSLog(@"Loaded file %@", filePath);
+    NSLog(@"Length: %i", len);
+    NSLog(@"ModName: %s", modName);
+
 }
 
 
@@ -67,13 +156,6 @@
                  options : 0
                  error:nil];
     
-
-    NSString *s = @"A567B$%C^.123456abcdefg";
-    NSCharacterSet *doNotWant1 = [[NSCharacterSet characterSetWithCharactersInString:@"ABCabc123"] invertedSet];
-    s = [[s componentsSeparatedByCharactersInSet: doNotWant1] componentsJoinedByString: @""];
-    NSLog(@"%@", s); // => ABC123abc
-
-    
     
     NSString *appUrlFull = [NSString stringWithFormat:@"file://%@", appUrl];
     appUrlFull = [[appUrlFull componentsSeparatedByString:@"%20"] componentsJoinedByString: @" "];
@@ -81,7 +163,7 @@
     NSString *shortenedUrlPath;
     
     for (NSURL *url in directories) {
-        shortenedUrlPath = [url absoluteString];
+        shortenedUrlPath = (NSString *)[url absoluteString];
         shortenedUrlPath = [[shortenedUrlPath componentsSeparatedByString:@"%20"] componentsJoinedByString: @" "];
         shortenedUrlPath = [[shortenedUrlPath componentsSeparatedByString:@"/mods/"] componentsJoinedByString: @""];
         shortenedUrlPath = [[shortenedUrlPath componentsSeparatedByString:appUrlFull] componentsJoinedByString: @""];

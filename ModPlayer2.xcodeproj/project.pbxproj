@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		711690681981DB8A00AC0EC8 /* libSDL2_mixer.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 711690671981DB8A00AC0EC8 /* libSDL2_mixer.a */; };
+		711A544A1981473F00F00572 /* libmodplug.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 71D2D4D7198011C300E8916E /* libmodplug.a */; };
 		71D2D49F1980041000E8916E /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 71D2D49E1980041000E8916E /* Foundation.framework */; };
 		71D2D4A11980041000E8916E /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 71D2D4A01980041000E8916E /* CoreGraphics.framework */; };
 		71D2D4A31980041000E8916E /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 71D2D4A21980041000E8916E /* UIKit.framework */; };
@@ -22,7 +24,6 @@
 		71D2D4C31980041000E8916E /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 71D2D4A21980041000E8916E /* UIKit.framework */; };
 		71D2D4CB1980041000E8916E /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 71D2D4C91980041000E8916E /* InfoPlist.strings */; };
 		71D2D4CD1980041000E8916E /* ModPlayer2Tests.m in Sources */ = {isa = PBXBuildFile; fileRef = 71D2D4CC1980041000E8916E /* ModPlayer2Tests.m */; };
-		71D2D4D9198011C300E8916E /* libmodplug.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 71D2D4D7198011C300E8916E /* libmodplug.a */; };
 		71D2D4DD1980120900E8916E /* ModPlayer.m in Sources */ = {isa = PBXBuildFile; fileRef = 71D2D4DC1980120900E8916E /* ModPlayer.m */; };
 		71D2D4E21980132600E8916E /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 71D2D4DF1980132600E8916E /* AudioToolbox.framework */; };
 		71D2D4E41980132600E8916E /* CoreAudio.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 71D2D4E11980132600E8916E /* CoreAudio.framework */; };
@@ -40,6 +41,10 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		711690671981DB8A00AC0EC8 /* libSDL2_mixer.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libSDL2_mixer.a; sourceTree = "<group>"; };
+		711690691981DBC700AC0EC8 /* SDL_config.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SDL_config.h; sourceTree = "<group>"; };
+		7116906A1981DBD400AC0EC8 /* SDL_mixer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SDL_mixer.h; sourceTree = "<group>"; };
+		711A53E219812E9D00F00572 /* libSDL2Sim.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libSDL2Sim.a; path = lib/libSDL2Sim.a; sourceTree = "<group>"; };
 		71D2D49B1980041000E8916E /* ModPlayer2.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ModPlayer2.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		71D2D49E1980041000E8916E /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		71D2D4A01980041000E8916E /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
@@ -75,11 +80,12 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				71D2D4E21980132600E8916E /* AudioToolbox.framework in Frameworks */,
+				711690681981DB8A00AC0EC8 /* libSDL2_mixer.a in Frameworks */,
 				71D2D4E41980132600E8916E /* CoreAudio.framework in Frameworks */,
+				711A544A1981473F00F00572 /* libmodplug.a in Frameworks */,
+				71D2D4E21980132600E8916E /* AudioToolbox.framework in Frameworks */,
 				71D2D4A11980041000E8916E /* CoreGraphics.framework in Frameworks */,
 				71D2D4A31980041000E8916E /* UIKit.framework in Frameworks */,
-				71D2D4D9198011C300E8916E /* libmodplug.a in Frameworks */,
 				71D2D49F1980041000E8916E /* Foundation.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -121,6 +127,7 @@
 		71D2D49D1980041000E8916E /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				711A53E219812E9D00F00572 /* libSDL2Sim.a */,
 				71D2D4DF1980132600E8916E /* AudioToolbox.framework */,
 				71D2D4E01980132600E8916E /* AudioUnit.framework */,
 				71D2D4E11980132600E8916E /* CoreAudio.framework */,
@@ -181,6 +188,9 @@
 		71D2D4D61980041900E8916E /* lib */ = {
 			isa = PBXGroup;
 			children = (
+				7116906A1981DBD400AC0EC8 /* SDL_mixer.h */,
+				711690691981DBC700AC0EC8 /* SDL_config.h */,
+				711690671981DB8A00AC0EC8 /* libSDL2_mixer.a */,
 				71D2D4D7198011C300E8916E /* libmodplug.a */,
 				71D2D4D8198011C300E8916E /* modplug.h */,
 			);
