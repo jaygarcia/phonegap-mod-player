@@ -6,17 +6,30 @@
 //  Copyright (c) 2014 Modus Create. All rights reserved.
 //
 
-#import "ModPlayer.h"
+
+#include "ModPlayer.h"
+
+
+
 
 @implementation ModPlayer {
-    ModPlugFile *mp_file;
+//    ModPlugFile *mpFile;
 	int *genRow,*genPattern, *playRow,*playPattern;
     unsigned char *genVolData, *playVolData;
 	char *mp_data;
 	int numPatterns, numSamples, numInstr;
     
     ModPlug_Settings settings;
+    
+    AudioQueueRef mAudioQueue;
+    AudioQueueBufferRef *mBuffers;
+    PlayState *playState;
+}
 
+
+
+- (ModPlugFile *) getMpFile {
+    return self.mpFile;
 }
 
 
@@ -30,17 +43,14 @@
         otherButtonTitles:nil,
     nil];
     
-    
     [alert show];
-    
-
     
     NSMutableArray *dirs = [self getModFileDirectories:@""];
     
     NSString *firstDir = [dirs objectAtIndex:1];
     
     NSMutableArray *files = [self getFilesInDirectory:firstDir];
-    NSURL *fileUrl = [files objectAtIndex:3];
+    NSURL *fileUrl = [files objectAtIndex:1];
     NSString *firstFile = [[fileUrl filePathURL] absoluteString];
 
     firstFile = [[firstFile componentsSeparatedByString:@"%20"] componentsJoinedByString: @" "];
@@ -54,33 +64,12 @@
 }
 
 - (void) playFile:(NSString *) filePath {
+    
+    NSLog(@"Loaded file %@", filePath);
+
     ModPlug_GetSettings(&settings);
 
-
-//    settings.mFlags=MODPLUG_ENABLE_OVERSAMPLING;
-    
-//    	int mFlags;  /* One or more of the MODPLUG_ENABLE_* flags above, bitwise-OR'ed */
-	
-	/* Note that ModPlug always decodes sound at 44100kHz, 32 bit, stereo and then
-	 * down-mixes to the settings you choose. */
-//	int mChannels;       /* Number of channels - 1 for mono or 2 for stereo */
-//	int mBits;           /* Bits per sample - 8, 16, or 32 */
-//	int mFrequency;      /* Sampling rate - 11025, 22050, or 44100 */
-//	int mResamplingMode; /* One of MODPLUG_RESAMPLE_*, above */
-//
-//	int mStereoSeparation; /* Stereo separation, 1 - 256 */
-//	int mMaxMixChannels; /* Maximum number of mixing channels (polyphony), 32 - 256 */
-//	
-//	int mReverbDepth;    /* Reverb level 0(quiet)-100(loud)      */
-//	int mReverbDelay;    /* Reverb delay in ms, usually 40-200ms */
-//	int mBassAmount;     /* XBass level 0(quiet)-100(loud)       */
-//	int mBassRange;      /* XBass cutoff in Hz 10-100            */
-//	int mSurroundDepth;  /* Surround level 0(quiet)-100(heavy)   */
-//	int mSurroundDelay;  /* Surround delay in ms, usually 5-40ms */
-//	int mLoopCount;      /* Number of times to loop.  Zero prevents looping.
-//	                        -1 loops forever. */
-//    
-    
+    settings.mFlags=MODPLUG_ENABLE_OVERSAMPLING;
     settings.mChannels=2;
     settings.mBits=16;
     settings.mFrequency=44100;
@@ -119,32 +108,116 @@
     ModPlugFile *mpFile;
     
     mpFile = ModPlug_Load(fileData, fileSize);
+    self.mpFile = mpFile;
+    
     ModPlug_SetMasterVolume(mpFile, 128);
     ModPlug_Seek(mpFile, 0);
     
-    
     const char *modName = ModPlug_GetName(mpFile);
 
-    /* Get the length of the mod, in milliseconds.  Note that this result is not always
-     * accurate, especially in the case of mods with loops. */
     int len = ModPlug_GetLength(mpFile);
 
-    NSLog(@"Loaded file %@", filePath);
     NSLog(@"Length: %i", len);
     NSLog(@"ModName: %s", modName);
+ 
+     
+    [self initSound];
+
+//    [NSThread detachNewThreadSelector:@selector(myMainThreadMethod) toTarget:self withObject:nil];
+}
+
+- (void) myMainThreadMethod {
+    NSLog(@"Thread kicked off");
+    
+    while (1) {
+        [NSThread sleepForTimeInterval:0.1];
+    
+        NSLog(@"Teh Thread is werking");
+        NSLog(@"ModName: %s", ModPlug_GetName(self.mpFile));
+
+    }
 
 }
 
 
 
+- (void) initSound {
+    ModPlugFile *mpFile = self.mpFile;
+
+    AudioStreamBasicDescription mDataFormat;
+    UInt32 err;
+    float mVolume = 1.0f;
+    
+//    PlayState *playState2 = playState;
+//    playState2->currentPacket = 0;
+//
+//    
+    /* We force this format for iPhone */
+    mDataFormat.mFormatID = kAudioFormatLinearPCM;
+    mDataFormat.mFormatFlags = kLinearPCMFormatFlagIsSignedInteger | kAudioFormatFlagIsPacked;
+	mDataFormat.mSampleRate = PLAYBACK_FREQ;
+	mDataFormat.mBitsPerChannel = 16;
+	mDataFormat.mChannelsPerFrame = 2;
+    mDataFormat.mBytesPerFrame = (mDataFormat.mBitsPerChannel>>3) * mDataFormat.mChannelsPerFrame;
+    mDataFormat.mFramesPerPacket = 1;
+    mDataFormat.mBytesPerPacket = mDataFormat.mBytesPerFrame;
+
+
+
+    err = AudioQueueNewOutput(&mDataFormat,
+                         audioCallback,
+                         CFBridgingRetain(self),
+                         CFRunLoopGetCurrent(),
+                         kCFRunLoopCommonModes,
+                         0,
+                         &mAudioQueue);
+
+    /* Create associated buffers */
+    mBuffers = (AudioQueueBufferRef*) malloc( sizeof(AudioQueueBufferRef) * SOUND_BUFFER_NB );
+    
+    for (int i = 0; i < SOUND_BUFFER_NB; i++) {
+		AudioQueueBufferRef mBuffer;
+		err = AudioQueueAllocateBuffer(mAudioQueue, SOUND_BUFFER_SIZE_SAMPLE * 2 * 2, &mBuffer );
+		
+		mBuffers[i] = mBuffer;
+        NSLog(@"Created Buffer #%i", i);
+        mBuffer->mAudioDataByteSize = SOUND_BUFFER_SIZE_SAMPLE * 2 * 2;
+        
+        
+        ModPlug_Read(mpFile, (char*)mBuffer->mAudioData, SOUND_BUFFER_SIZE_SAMPLE * 2 * 2);
+
+        AudioQueueEnqueueBuffer(mAudioQueue, mBuffers[i], 0, NULL);
+    }
+    
+    
+    /* Set initial playback volume */
+    err = AudioQueueSetParameter(mAudioQueue, kAudioQueueParam_Volume, mVolume );
+    err = AudioQueueStart(mAudioQueue, NULL );
+    
+}
+
+
+void audioCallback(void *data, AudioQueueRef mQueue, AudioQueueBufferRef mBuffer) {
+    ModPlayer *modPlayer = (__bridge ModPlayer*)data;
+    ModPlugFile *mpFile = modPlayer.mpFile;
+    
+    NSLog(@"audioCallback");
+    
+    mBuffer->mAudioDataByteSize = SOUND_BUFFER_SIZE_SAMPLE*2*2;
+    ModPlug_Read(mpFile, (char*)mBuffer->mAudioData, SOUND_BUFFER_SIZE_SAMPLE * 2 * 2);
+    AudioQueueEnqueueBuffer(mQueue, mBuffer, 0, NULL);
+
+    NSLog(@"Just read");
+}
+
 
 - (NSMutableArray *) getModFileDirectories: (NSString *)modPath {
     NSMutableArray *paths = [[NSMutableArray alloc] init];
     
-    NSString *appUrl    = [[NSBundle mainBundle] bundlePath];
-    NSString *modsUrl   = [appUrl stringByAppendingString:@"/mods"];
+    NSString *appUrl      = [[NSBundle mainBundle] bundlePath];
+    NSString *modsUrl     = [appUrl stringByAppendingString:@"/mods"];
     
-    NSURL *directoryUrl = [[NSURL alloc] initFileURLWithPath:modsUrl] ;
+    NSURL *directoryUrl   = [[NSURL alloc] initFileURLWithPath:modsUrl];
     
     NSFileManager *fileManager = [NSFileManager defaultManager];
     
@@ -209,7 +282,7 @@
             //handle error
         }
         else if (! [isDirectory boolValue]) {
-            NSLog(@"%@", [url lastPathComponent]);
+//            NSLog(@"%@", [url lastPathComponent]);
 
             [files addObject:url];
         }
@@ -219,101 +292,6 @@
 }
 
 
-- (NSString *) getModDirectoriesAsJson {
-
-    NSString *appUrl    = [[NSBundle mainBundle] bundlePath];
-    NSString *modsUrl   = [appUrl stringByAppendingString:@"/mods"];
-    
-    NSURL *directoryUrl = [[NSURL alloc] initFileURLWithPath:modsUrl] ;
-    
-    NSFileManager *fileManager = [NSFileManager defaultManager];
-    NSArray *keys = [NSArray arrayWithObject:NSURLIsDirectoryKey];
-    
-    NSArray *directories = [fileManager
-                             contentsOfDirectoryAtURL: directoryUrl
-                             includingPropertiesForKeys : keys
-                             options : 0
-                             error:nil
-                            ];
-
-    NSMutableArray *pathDictionaries = [[NSMutableArray alloc] init];
-    
-    for (NSURL *url in directories) {
-         NSDictionary *jsonObj = [[NSDictionary alloc]
-                                    initWithObjectsAndKeys:
-                                        [url lastPathComponent], @"dirName",
-                                        [url path], @"path",
-                                        nil
-                                    ];
-        
-        
-        [pathDictionaries addObject:jsonObj];
-    }
-    
-    NSError *jsonError;
-    NSData *jsonData = [NSJSONSerialization
-                        dataWithJSONObject:pathDictionaries
-                        options:NSJSONWritingPrettyPrinted
-                        error:&jsonError
-                       ];
-    
-    NSString *jsonDataString = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
-
-    return jsonDataString;
-}
-
-
-
-- (NSString *) getModFilesAsJson: (NSString*)path {
-    
-    NSURL *directoryUrl = [[NSURL alloc] initFileURLWithPath:path];
-    
-    NSFileManager *fileManager = [[NSFileManager alloc] init];
-    
-    NSArray *keys = [NSArray arrayWithObject:NSURLIsDirectoryKey];
-    
-    NSDirectoryEnumerator *enumerator = [fileManager
-                                         enumeratorAtURL : directoryUrl
-                                         includingPropertiesForKeys : keys
-                                         options : 0
-                                         errorHandler : ^(NSURL *url, NSError *error) {
-                                             //Handle the error.
-                                             // Return YES if the enumeration should continue after the error.
-                                             NSLog(@"Error :: %@", error);
-                                             return YES;
-                                         }];
-    
-    NSMutableArray *pathDictionaries = [[NSMutableArray alloc] init];
-
-    for (NSURL *url in enumerator) {
-        NSError *error;
-        NSNumber *isDirectory = nil;
-        if (! [url getResourceValue:&isDirectory forKey:NSURLIsDirectoryKey error:&error]) {
-            //handle error
-        }
-        else if (! [isDirectory boolValue]) {
-            NSDictionary *jsonObj = [[NSDictionary alloc]
-                initWithObjectsAndKeys:
-                    [url lastPathComponent], @"fileName",
-                    [url path], @"path",
-                    nil
-                ];
-            [pathDictionaries addObject:jsonObj];
-
-        }
-    }
-    
-    NSError *jsonError;
-    NSData *jsonData = [NSJSONSerialization
-                        dataWithJSONObject:pathDictionaries
-                        options:NSJSONWritingPrettyPrinted
-                        error:&jsonError
-                    ];
-    
-    NSString *jsonDataString = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
-
-    return jsonDataString;
-}
 
 
 #pragma mark - CORDOVA
