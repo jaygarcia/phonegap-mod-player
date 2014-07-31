@@ -9,24 +9,35 @@
 
 #include "ModPlayer.h"
 
-
-
-
 @implementation ModPlayer {
-//    ModPlugFile *mpFile;
 	int *genRow,*genPattern, *playRow,*playPattern;
     unsigned char *genVolData, *playVolData;
 	char *mp_data;
-	int numPatterns, numSamples, numInstr;
+	
+    int numPatterns;
+    int numSamples;
+    int numInstr;
+    int numChannels;
+    char *modMessage;
     
+    int lastPattern; // Used for determining if we already looked at this pattern. TODO: Delete
+    
+    
+    ModPlugFile *loadedModPlugFile;
     ModPlug_Settings settings;
     
     AudioQueueRef mAudioQueue;
     AudioQueueBufferRef *mBuffers;
-    PlayState *playState;
+    
+    NSMutableArray *songPatterns;
+    char *loadedFileData;
+    int loadedFileSize;
+
 }
 
-
+static char note2charA[12]={'C','C','D','D','E','F','F','G','G','A','A','B'};
+static char note2charB[12]={'-','#','-','#','-','-','#','-','#','-','#','-'};
+static char dec2hex[16]={'0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F'};
 
 - (ModPlugFile *) getMpFile {
     return self.mpFile;
@@ -47,23 +58,56 @@
     
     NSMutableArray *dirs = [self getModFileDirectories:@""];
     
-    NSString *firstDir = [dirs objectAtIndex:1];
+    NSString *firstDir = [dirs objectAtIndex:2];
     
     NSMutableArray *files = [self getFilesInDirectory:firstDir];
-    NSURL *fileUrl = [files objectAtIndex:1];
+    NSURL *fileUrl = [files objectAtIndex:0];
     NSString *firstFile = [[fileUrl filePathURL] absoluteString];
 
     firstFile = [[firstFile componentsSeparatedByString:@"%20"] componentsJoinedByString: @" "];
     firstFile = [[firstFile componentsSeparatedByString:@"file://"] componentsJoinedByString: @""];
     
     
+    
+    [self loadFile:firstFile];
+//    [self preLoadPatterns:firstFile];
     [self playFile:firstFile];
 
 
 //    NSLog(@"Here");
 }
 
-- (void) playFile:(NSString *) filePath {
+- (void) preLoadPatterns:(NSString *)  filePath  {
+    NSLog(@"Loaded file %@", filePath);
+    
+    //songPatterns
+    
+    
+    
+}
+
+- (void) loadFile:(NSString *)filePath  {
+    FILE *file;
+    int fileSize;
+
+    const char* fil = [filePath cStringUsingEncoding:NSASCIIStringEncoding];
+    
+    file = fopen(fil, "rb");
+    
+    if (file == NULL) {
+      return;
+    }
+    
+    fseek(file, 0L, SEEK_END);
+    (loadedFileSize) = ftell(file);
+    rewind(file);
+    loadedFileData = (char*) malloc(loadedFileSize);
+    
+    fread(loadedFileData, fileSize, sizeof(char), file);
+    fclose(file);
+}
+
+- (void) playFile:(NSString *)filePath {
     
     NSLog(@"Loaded file %@", filePath);
 
@@ -85,37 +129,21 @@
     
     ModPlug_SetSettings(&settings);
     
-    FILE *file;
-    char *fileData;
-    int fileSize;
+    loadedModPlugFile = ModPlug_Load(loadedFileData, loadedFileSize);
+    numPatterns       = ModPlug_NumPatterns(loadedModPlugFile);
+    numChannels       = ModPlug_NumChannels(loadedModPlugFile);
+    numSamples        = ModPlug_NumSamples(loadedModPlugFile);
+    numInstr          = ModPlug_NumInstruments(loadedModPlugFile);
+    modMessage        = ModPlug_GetMessage(loadedModPlugFile);
+    
+    self.mpFile = loadedModPlugFile;
+    
+    ModPlug_SetMasterVolume(loadedModPlugFile, 128);
+    ModPlug_Seek(loadedModPlugFile, 0);
+    
+    const char *modName = ModPlug_GetName(loadedModPlugFile);
 
-    const char* fil = [filePath cStringUsingEncoding:NSASCIIStringEncoding];
-    
-    file = fopen(fil, "rb");
-    
-    if (file == NULL) {
-      return;
-    }
-    
-    fseek(file, 0L, SEEK_END);
-    (fileSize) = ftell(file);
-    rewind(file);
-    fileData = (char*) malloc(fileSize);
-    
-    fread(fileData, fileSize, sizeof(char), file);
-    fclose(file);
-
-    ModPlugFile *mpFile;
-    
-    mpFile = ModPlug_Load(fileData, fileSize);
-    self.mpFile = mpFile;
-    
-    ModPlug_SetMasterVolume(mpFile, 128);
-    ModPlug_Seek(mpFile, 0);
-    
-    const char *modName = ModPlug_GetName(mpFile);
-
-    int len = ModPlug_GetLength(mpFile);
+    int len = ModPlug_GetLength(loadedModPlugFile);
 
     NSLog(@"Length: %i", len);
     NSLog(@"ModName: %s", modName);
@@ -134,7 +162,6 @@
     
         NSLog(@"Teh Thread is werking");
         NSLog(@"ModName: %s", ModPlug_GetName(self.mpFile));
-
     }
 
 }
@@ -148,10 +175,6 @@
     UInt32 err;
     float mVolume = 1.0f;
     
-//    PlayState *playState2 = playState;
-//    playState2->currentPacket = 0;
-//
-//    
     /* We force this format for iPhone */
     mDataFormat.mFormatID = kAudioFormatLinearPCM;
     mDataFormat.mFormatFlags = kLinearPCMFormatFlagIsSignedInteger | kAudioFormatFlagIsPacked;
@@ -175,17 +198,20 @@
     /* Create associated buffers */
     mBuffers = (AudioQueueBufferRef*) malloc( sizeof(AudioQueueBufferRef) * SOUND_BUFFER_NB );
     
+    int bytesRead;
+
     for (int i = 0; i < SOUND_BUFFER_NB; i++) {
 		AudioQueueBufferRef mBuffer;
 		err = AudioQueueAllocateBuffer(mAudioQueue, SOUND_BUFFER_SIZE_SAMPLE * 2 * 2, &mBuffer );
 		
 		mBuffers[i] = mBuffer;
-        NSLog(@"Created Buffer #%i", i);
+//        NSLog(@"Created Buffer #%i", i);
         mBuffer->mAudioDataByteSize = SOUND_BUFFER_SIZE_SAMPLE * 2 * 2;
         
+        bytesRead = ModPlug_Read(mpFile, (char*)mBuffer->mAudioData, SOUND_BUFFER_SIZE_SAMPLE * 2 * 2);
         
-        ModPlug_Read(mpFile, (char*)mBuffer->mAudioData, SOUND_BUFFER_SIZE_SAMPLE * 2 * 2);
-
+        [self parsePattern];
+        
         AudioQueueEnqueueBuffer(mAudioQueue, mBuffers[i], 0, NULL);
     }
     
@@ -201,15 +227,130 @@ void audioCallback(void *data, AudioQueueRef mQueue, AudioQueueBufferRef mBuffer
     ModPlayer *modPlayer = (__bridge ModPlayer*)data;
     ModPlugFile *mpFile = modPlayer.mpFile;
     
-    NSLog(@"audioCallback");
+    int bytesRead;
+    
+//    NSLog(@"audioCallback");
     
     mBuffer->mAudioDataByteSize = SOUND_BUFFER_SIZE_SAMPLE*2*2;
-    ModPlug_Read(mpFile, (char*)mBuffer->mAudioData, SOUND_BUFFER_SIZE_SAMPLE * 2 * 2);
-    AudioQueueEnqueueBuffer(mQueue, mBuffer, 0, NULL);
+    bytesRead = ModPlug_Read(mpFile, (char*)mBuffer->mAudioData, SOUND_BUFFER_SIZE_SAMPLE * 2 * 2);
 
-    NSLog(@"Just read");
+    if (bytesRead < 1) {
+        ModPlug_Seek(mpFile, 0);
+        bytesRead = ModPlug_Read(mpFile, (char*)mBuffer->mAudioData, SOUND_BUFFER_SIZE_SAMPLE * 2 * 2);
+    }
+    
+    [modPlayer parsePattern];
+
+    
+    
+    AudioQueueEnqueueBuffer(mQueue, mBuffer, 0, NULL);
 }
 
+
+- (void) parsePattern {
+    
+    ModPlugFile *mpFile = self.mpFile;
+    
+
+    int currOrder = ModPlug_GetCurrentOrder(mpFile);
+    int currentPatternNumber = ModPlug_GetCurrentPattern(mpFile);
+    int currRow   = ModPlug_GetCurrentRow(mpFile);
+
+    unsigned int rowsToGet;
+    ModPlugNote *pattern = ModPlug_GetPattern(mpFile, currentPatternNumber, &rowsToGet);
+
+
+    unsigned int patternNote;
+    unsigned int instrument;
+    unsigned int volumeEffect;
+    unsigned int effect;
+    unsigned int volume;
+    unsigned int parameter;
+
+    
+    if (currentPatternNumber != lastPattern) {
+        lastPattern = currentPatternNumber;
+        printf("\n\n                              ____ 01 ___  ___ 02 ___  ___ 03 ___  ___ 04 ___  ___ 05 ___  ___ 06 ___  ___ 07 ___  ___ 08 ___\n");
+        // ">> Ord 2	Pat 50	Row 60 	 ..........  .......D..  .......D..  B-31B.....  ..........  .......L..  B-41A0A...  .........."
+//        printf("\n\t\t\t 1\t\t2\n");
+    }
+    
+    printf(">> Ord %i\tPat %i\tRow %i \t ", currOrder, currentPatternNumber, currRow);
+  
+    int index;
+    int k = 0;
+    char str_data[200];
+    int currentPatternPosition;
+    
+    
+    
+
+    // The following was inspired by the Modizer project: https://github.com/yoyofr/modizer
+    for (index = 0; index < numChannels; index++) {
+        currentPatternPosition = index + (numChannels * currRow);
+        
+        patternNote  = pattern[currentPatternPosition].Note;
+        instrument   = pattern[currentPatternPosition].Instrument;
+        volumeEffect = pattern[currentPatternPosition].VolumeEffect;
+        effect       = pattern[currentPatternPosition].Effect;
+        volume       = pattern[currentPatternPosition].Volume;
+        parameter    = pattern[currentPatternPosition].Parameter;
+ 
+        if (patternNote) {
+            str_data[k++] = note2charA[(patternNote - 13) % 12];
+            str_data[k++] = note2charB[(patternNote - 13) % 12];
+            str_data[k++] = (patternNote - 13) / 12 + '0';
+        }
+        else {
+            str_data[k++]='.';
+            str_data[k++]='.';
+            str_data[k++]='.';
+        }
+        
+        if (instrument) {
+            str_data[k++]=dec2hex[ (instrument >> 4) & 0xF ];
+            str_data[k++]=dec2hex[ instrument & 0xF ];
+        }
+        else {
+            str_data[k++]='.';
+            str_data[k++]='.';
+        }
+        
+        if (volume) {
+            str_data[k++] = dec2hex[ (volume >> 4) & 0xF ];
+            str_data[k++] = dec2hex[ volume & 0xF ];
+        }
+        else {
+            str_data[k++]='.';
+            str_data[k++]='.';
+        }
+        
+        if (effect) {
+            str_data[k++]='A' + effect;
+        }
+        else {
+            str_data[k++]='.';
+        }
+        
+        if (parameter) {
+            str_data[k++] = dec2hex[(parameter >> 4) & 0xF];
+            str_data[k++] = dec2hex[parameter & 0xF];
+        }
+        else {
+            str_data[k++]='.';
+            str_data[k++]='.';
+        }
+        
+        str_data[k++]=' ';
+        str_data[k++]=' ';
+      
+    }
+    
+        printf("%s\n", str_data);
+
+    
+//    NSLog(@"bytesRead: %i", bytesRead);
+}
 
 - (NSMutableArray *) getModFileDirectories: (NSString *)modPath {
     NSMutableArray *paths = [[NSMutableArray alloc] init];
