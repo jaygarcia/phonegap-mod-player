@@ -21,9 +21,8 @@
     int numPatterns,
         numSamples,
         numInstr,
-        numChannels;
-    
-    int lastPattern; // Used for determining if we already looked at this pattern. TODO: Delete
+        numChannels,
+        lastPattern; // Used for determining if we already looked at this pattern. TODO: Delete
     
     ModPlugFile *loadedModPlugFile;
     ModPlug_Settings settings;
@@ -47,7 +46,6 @@
         ]
     
     }
-    
     */
 
 
