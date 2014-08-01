@@ -11,18 +11,19 @@
 #include "time.h"
 
 @implementation ModPlayer {
-	int *genRow,*genPattern, *playRow,*playPattern;
-    unsigned char *genVolData, *playVolData;
-	char *mp_data;
+
+    unsigned char *genVolData,
+                  *playVolData;
 	
-    int numPatterns;
-    int numSamples;
-    int numInstr;
-    int numChannels;
-    char *modMessage;
+    char *mp_data,
+    *modMessage;
+	
+    int numPatterns,
+        numSamples,
+        numInstr,
+        numChannels;
     
     int lastPattern; // Used for determining if we already looked at this pattern. TODO: Delete
-    
     
     ModPlugFile *loadedModPlugFile;
     ModPlug_Settings settings;
@@ -62,22 +63,23 @@ static char dec2hex[16]={'0','1','2','3','4','5','6','7','8','9','A','B','C','D'
 
 
 - (void) playSong {
-    UIAlertView *alert = [
-        [UIAlertView alloc]
-        initWithTitle:@"Title"
-        message:@"App loaded"
-        delegate:nil
-        cancelButtonTitle:@"ok"
-        otherButtonTitles:nil,
-    nil];
+//    UIAlertView *alert = [
+//        [UIAlertView alloc]
+//        initWithTitle:@"Title"
+//        message:@"App loaded"
+//        delegate:nil
+//        cancelButtonTitle:@"ok"
+//        otherButtonTitles:nil,
+//    nil];
+//    
+//    [alert show];
     
-    [alert show];
     
     NSMutableArray *dirs = [self getModFileDirectories:@""];
     
     NSString *firstDir = [dirs objectAtIndex:2];
     
-    NSMutableArray *files = [self getFilesInDirectory:firstDir];
+    NSMutableArray *files = [self getFilesInDirectory: firstDir];
     NSURL *fileUrl = [files objectAtIndex:0];
     NSString *firstFile = [[fileUrl filePathURL] absoluteString];
 
@@ -406,7 +408,6 @@ void audioCallback(void *data, AudioQueueRef mQueue, AudioQueueBufferRef mBuffer
 }
 
 - (NSMutableArray *) getModFileDirectories: (NSString *)modPath {
-    NSMutableArray *paths = [[NSMutableArray alloc] init];
     
     NSString *appUrl  = [[NSBundle mainBundle] bundlePath];
     NSString *modsUrl = [appUrl stringByAppendingString:@"/mods"];
@@ -425,16 +426,23 @@ void audioCallback(void *data, AudioQueueRef mQueue, AudioQueueBufferRef mBuffer
     
     
     NSString *appUrlFull = [NSString stringWithFormat:@"file://%@", appUrl];
+
     appUrlFull = [[appUrlFull componentsSeparatedByString:@"%20"] componentsJoinedByString: @" "];
     
+    NSMutableArray *paths = [[NSMutableArray alloc] init];
+
     NSString *shortenedUrlPath;
     
     for (NSURL *url in directories) {
+    
         shortenedUrlPath = (NSString *)[url absoluteString];
         shortenedUrlPath = [[shortenedUrlPath componentsSeparatedByString:@"%20"] componentsJoinedByString: @" "];
-        shortenedUrlPath = [[shortenedUrlPath componentsSeparatedByString:@"/mods/"] componentsJoinedByString: @""];
-        shortenedUrlPath = [[shortenedUrlPath componentsSeparatedByString:appUrlFull] componentsJoinedByString: @""];
+
+        shortenedUrlPath = [[shortenedUrlPath componentsSeparatedByString:@"mods/"] objectAtIndex:1];
+
     
+        // ios: file:///private/var/mobile/Applications/19E18193-D351-4BFB-849B-F25297DF8387/ModPlayer2.app/mods/Ali-Dbg/
+        // sim: Ali-Dbg/
         [paths addObject:shortenedUrlPath];
     }
     
@@ -446,10 +454,9 @@ void audioCallback(void *data, AudioQueueRef mQueue, AudioQueueBufferRef mBuffer
     NSMutableArray *files = [[NSMutableArray alloc] init];
     
 //    Todo: This is for the Touch 2 app. Be sure to re-enable this.
-    NSString *appUrl    = [[NSBundle mainBundle] bundlePath];
-    NSString *modsUrl   = [appUrl stringByAppendingString:@"/mods/"];
+    NSString *appUrl     = [[NSBundle mainBundle] bundlePath];
+    NSString *modsUrl    = [appUrl stringByAppendingString:@"/mods/"];
     NSString *targetPath = [modsUrl stringByAppendingString: path];
-    
     
     NSURL *directoryUrl = [[NSURL alloc] initFileURLWithPath:targetPath];
     
