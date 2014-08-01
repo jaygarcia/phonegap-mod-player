@@ -8,6 +8,7 @@
 
 
 #include "ModPlayer.h"
+#include "time.h"
 
 @implementation ModPlayer {
 	int *genRow,*genPattern, *playRow,*playPattern;
@@ -29,9 +30,25 @@
     AudioQueueRef mAudioQueue;
     AudioQueueBufferRef *mBuffers;
     
-    NSMutableArray *songPatterns;
     char *loadedFileData;
     int loadedFileSize;
+    char *modName;
+    
+
+    // An Object to produce the JSON below.
+    NSObject *songPatterns;
+    /*
+    {
+        patternX : [
+            "Pattern 1",
+            "Pattern 2"
+            "Pattern 3"
+        ]
+    
+    }
+    
+    */
+
 
 }
 
@@ -67,25 +84,11 @@ static char dec2hex[16]={'0','1','2','3','4','5','6','7','8','9','A','B','C','D'
     firstFile = [[firstFile componentsSeparatedByString:@"%20"] componentsJoinedByString: @" "];
     firstFile = [[firstFile componentsSeparatedByString:@"file://"] componentsJoinedByString: @""];
     
-    
-    
     [self loadFile:firstFile];
-//    [self preLoadPatterns:firstFile];
+    [self preLoadPatterns];
     [self playFile:firstFile];
 
-
-//    NSLog(@"Here");
 }
-
-- (void) preLoadPatterns:(NSString *)  filePath  {
-    NSLog(@"Loaded file %@", filePath);
-    
-    //songPatterns
-    
-    
-    
-}
-
 - (void) loadFile:(NSString *)filePath  {
     FILE *file;
     int fileSize;
@@ -105,12 +108,20 @@ static char dec2hex[16]={'0','1','2','3','4','5','6','7','8','9','A','B','C','D'
     
     fread(loadedFileData, fileSize, sizeof(char), file);
     fclose(file);
+    
+    
+    loadedModPlugFile = ModPlug_Load(loadedFileData, loadedFileSize);
+    numPatterns       = ModPlug_NumPatterns(loadedModPlugFile);
+    numChannels       = ModPlug_NumChannels(loadedModPlugFile);
+    numSamples        = ModPlug_NumSamples(loadedModPlugFile);
+    numInstr          = ModPlug_NumInstruments(loadedModPlugFile);
+    modMessage        = ModPlug_GetMessage(loadedModPlugFile);
+    modName           = (char *)ModPlug_GetName(loadedModPlugFile);
+    
+    self.mpFile = loadedModPlugFile;
 }
 
-- (void) playFile:(NSString *)filePath {
-    
-    NSLog(@"Loaded file %@", filePath);
-
+- (void) initModPlugSettings {
     ModPlug_GetSettings(&settings);
 
     settings.mFlags=MODPLUG_ENABLE_OVERSAMPLING;
@@ -128,30 +139,20 @@ static char dec2hex[16]={'0','1','2','3','4','5','6','7','8','9','A','B','C','D'
     settings.mStereoSeparation=32;
     
     ModPlug_SetSettings(&settings);
-    
-    loadedModPlugFile = ModPlug_Load(loadedFileData, loadedFileSize);
-    numPatterns       = ModPlug_NumPatterns(loadedModPlugFile);
-    numChannels       = ModPlug_NumChannels(loadedModPlugFile);
-    numSamples        = ModPlug_NumSamples(loadedModPlugFile);
-    numInstr          = ModPlug_NumInstruments(loadedModPlugFile);
-    modMessage        = ModPlug_GetMessage(loadedModPlugFile);
-    
-    self.mpFile = loadedModPlugFile;
+}
+
+- (void) playFile:(NSString *)filePath {
+    [self initModPlugSettings];
     
     ModPlug_SetMasterVolume(loadedModPlugFile, 128);
     ModPlug_Seek(loadedModPlugFile, 0);
     
-    const char *modName = ModPlug_GetName(loadedModPlugFile);
-
     int len = ModPlug_GetLength(loadedModPlugFile);
 
     NSLog(@"Length: %i", len);
     NSLog(@"ModName: %s", modName);
- 
-     
+    
     [self initSound];
-
-//    [NSThread detachNewThreadSelector:@selector(myMainThreadMethod) toTarget:self withObject:nil];
 }
 
 - (void) myMainThreadMethod {
@@ -185,8 +186,6 @@ static char dec2hex[16]={'0','1','2','3','4','5','6','7','8','9','A','B','C','D'
     mDataFormat.mFramesPerPacket = 1;
     mDataFormat.mBytesPerPacket = mDataFormat.mBytesPerFrame;
 
-
-
     err = AudioQueueNewOutput(&mDataFormat,
                          audioCallback,
                          CFBridgingRetain(self),
@@ -205,7 +204,6 @@ static char dec2hex[16]={'0','1','2','3','4','5','6','7','8','9','A','B','C','D'
 		err = AudioQueueAllocateBuffer(mAudioQueue, SOUND_BUFFER_SIZE_SAMPLE * 2 * 2, &mBuffer );
 		
 		mBuffers[i] = mBuffer;
-//        NSLog(@"Created Buffer #%i", i);
         mBuffer->mAudioDataByteSize = SOUND_BUFFER_SIZE_SAMPLE * 2 * 2;
         
         bytesRead = ModPlug_Read(mpFile, (char*)mBuffer->mAudioData, SOUND_BUFFER_SIZE_SAMPLE * 2 * 2);
@@ -219,7 +217,6 @@ static char dec2hex[16]={'0','1','2','3','4','5','6','7','8','9','A','B','C','D'
     /* Set initial playback volume */
     err = AudioQueueSetParameter(mAudioQueue, kAudioQueueParam_Volume, mVolume );
     err = AudioQueueStart(mAudioQueue, NULL );
-    
 }
 
 
@@ -229,8 +226,6 @@ void audioCallback(void *data, AudioQueueRef mQueue, AudioQueueBufferRef mBuffer
     
     int bytesRead;
     
-//    NSLog(@"audioCallback");
-    
     mBuffer->mAudioDataByteSize = SOUND_BUFFER_SIZE_SAMPLE*2*2;
     bytesRead = ModPlug_Read(mpFile, (char*)mBuffer->mAudioData, SOUND_BUFFER_SIZE_SAMPLE * 2 * 2);
 
@@ -238,127 +233,185 @@ void audioCallback(void *data, AudioQueueRef mQueue, AudioQueueBufferRef mBuffer
         ModPlug_Seek(mpFile, 0);
         bytesRead = ModPlug_Read(mpFile, (char*)mBuffer->mAudioData, SOUND_BUFFER_SIZE_SAMPLE * 2 * 2);
     }
-    
-    [modPlayer parsePattern];
-
-    
-    
+  
     AudioQueueEnqueueBuffer(mQueue, mBuffer, 0, NULL);
 }
 
 
-- (void) parsePattern {
+- (void) preLoadPatterns  {
+
+    NSLog(@"preLoadPatterns for %s", modName);
+    NSDate *start = [NSDate date];
     
+    // do stuff...
     ModPlugFile *mpFile = self.mpFile;
     
-
-    int currOrder = ModPlug_GetCurrentOrder(mpFile);
-    int currentPatternNumber = ModPlug_GetCurrentPattern(mpFile);
-    int currRow   = ModPlug_GetCurrentRow(mpFile);
-
-    unsigned int rowsToGet;
-    ModPlugNote *pattern = ModPlug_GetPattern(mpFile, currentPatternNumber, &rowsToGet);
-
-
-    unsigned int patternNote;
-    unsigned int instrument;
-    unsigned int volumeEffect;
-    unsigned int effect;
-    unsigned int volume;
-    unsigned int parameter;
-
+    int bytesRead,
+        currPattrn,
+        currRow,
+        prevPattrn,
+        prevRow;
     
-    if (currentPatternNumber != lastPattern) {
-        lastPattern = currentPatternNumber;
-        printf("\n\n                              ____ 01 ___  ___ 02 ___  ___ 03 ___  ___ 04 ___  ___ 05 ___  ___ 06 ___  ___ 07 ___  ___ 08 ___\n");
-        // ">> Ord 2	Pat 50	Row 60 	 ..........  .......D..  .......D..  B-31B.....  ..........  .......L..  B-41A0A...  .........."
-//        printf("\n\t\t\t 1\t\t2\n");
+    prevPattrn = prevRow =  -1;
+    
+    char *buffer = malloc(sizeof(char) * SOUND_BUFFER_SIZE_SAMPLE * 2 * 2);
+    
+    bytesRead = ModPlug_Read(mpFile, buffer, SOUND_BUFFER_SIZE_SAMPLE * 2 * 2);
+    
+    // We're going to stuff row strings in here.
+    NSMutableArray *patternStrings;
+    
+    while (bytesRead > 0) {
+        currPattrn = ModPlug_GetCurrentPattern(mpFile);
+        currRow    = ModPlug_GetCurrentRow(mpFile);
+        
+        
+//       NSLog(@"O %i \t P %i \t R %i", currOrder, currPattrn, currRow);
+
+        // When we hit a new pattern, create a new array so that we can stuff strings into it.
+        if (currPattrn != prevPattrn) {
+//                NSLog(@"New pattern :: #%i", currPattrn);
+
+            // Add new pattern
+            if (patternStrings) {
+                NSString *key = [NSString stringWithFormat:@"%d", prevPattrn];
+                [songPatterns setValue:patternStrings forKey:key];
+            }
+            
+            patternStrings = [[NSMutableArray alloc] init];
+        }
+    
+        // Skip to the next row so we don't get duplicate patterns in the array.
+        if (currPattrn == prevPattrn && currRow == prevRow) {
+            
+            memset(buffer, 0, SOUND_BUFFER_SIZE_SAMPLE * 2 * 2);
+            bytesRead = ModPlug_Read(mpFile, buffer, SOUND_BUFFER_SIZE_SAMPLE * 2 * 2);
+
+            continue;
+        }
+        
+        
+        NSString *rowString = [self parsePattern];
+        [patternStrings addObject:rowString];
+        
+                 
+        prevPattrn = currPattrn;
+        prevRow    = currRow;
+        
+        memset(buffer, 0, SOUND_BUFFER_SIZE_SAMPLE * 2 * 2);
+        bytesRead = ModPlug_Read(mpFile, buffer, SOUND_BUFFER_SIZE_SAMPLE * 2 * 2);
     }
     
-    printf(">> Ord %i\tPat %i\tRow %i \t ", currOrder, currentPatternNumber, currRow);
-  
-    int index;
-    int k = 0;
-    char str_data[200];
-    int currentPatternPosition;
+    NSTimeInterval timeInterval = [start timeIntervalSinceNow];
     
+    NSString *message = [[NSString alloc] initWithFormat:@"Done reading %f(ms)", timeInterval];
+    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"DONE!" message:message delegate:nil cancelButtonTitle:@"sweet" otherButtonTitles:nil, nil];
+    [alert show];
     
+}
+
+
+- (NSString *) parsePattern {
+    
+    ModPlugFile *mpFile = self.mpFile;
+
+    unsigned int rowsToGet,
+                 patternNote,
+                 instrument,
+                 volumeEffect,
+                 effect,
+                 volume,
+                 parameter;
+
+    
+    // todo: optimize (by reusing previous data);
+    int currentPatternNumber = ModPlug_GetCurrentPattern(mpFile),
+        currRow              = ModPlug_GetCurrentRow(mpFile);
+
+    ModPlugNote *pattern = ModPlug_GetPattern(mpFile, currentPatternNumber, &rowsToGet);
+
+    int index,
+        curPatPosition,
+        k = 0;
+    
+    char stringData[200];
+    
+    if (! pattern) {
+        NSLog(@"No Pattern for pattern# %i!!", currentPatternNumber);
+        return @"";
+    }
     
 
-    // The following was inspired by the Modizer project: https://github.com/yoyofr/modizer
+    // The following for loop was inspired by the Modizer project: https://github.com/yoyofr/modizer
     for (index = 0; index < numChannels; index++) {
-        currentPatternPosition = index + (numChannels * currRow);
+        curPatPosition = index + (numChannels * currRow);
         
-        patternNote  = pattern[currentPatternPosition].Note;
-        instrument   = pattern[currentPatternPosition].Instrument;
-        volumeEffect = pattern[currentPatternPosition].VolumeEffect;
-        effect       = pattern[currentPatternPosition].Effect;
-        volume       = pattern[currentPatternPosition].Volume;
-        parameter    = pattern[currentPatternPosition].Parameter;
+        patternNote  = pattern[curPatPosition].Note;
+        instrument   = pattern[curPatPosition].Instrument;
+        volumeEffect = pattern[curPatPosition].VolumeEffect;
+        effect       = pattern[curPatPosition].Effect;
+        volume       = pattern[curPatPosition].Volume;
+        parameter    = pattern[curPatPosition].Parameter;
  
         if (patternNote) {
-            str_data[k++] = note2charA[(patternNote - 13) % 12];
-            str_data[k++] = note2charB[(patternNote - 13) % 12];
-            str_data[k++] = (patternNote - 13) / 12 + '0';
+            stringData[k++] = note2charA[(patternNote - 13) % 12];
+            stringData[k++] = note2charB[(patternNote - 13) % 12];
+            stringData[k++] = (patternNote - 13) / 12 + '0';
         }
         else {
-            str_data[k++]='.';
-            str_data[k++]='.';
-            str_data[k++]='.';
+            stringData[k++]='.';
+            stringData[k++]='.';
+            stringData[k++]='.';
         }
         
         if (instrument) {
-            str_data[k++]=dec2hex[ (instrument >> 4) & 0xF ];
-            str_data[k++]=dec2hex[ instrument & 0xF ];
+            stringData[k++]=dec2hex[ (instrument >> 4) & 0xF ];
+            stringData[k++]=dec2hex[ instrument & 0xF ];
         }
         else {
-            str_data[k++]='.';
-            str_data[k++]='.';
+            stringData[k++]='.';
+            stringData[k++]='.';
         }
         
         if (volume) {
-            str_data[k++] = dec2hex[ (volume >> 4) & 0xF ];
-            str_data[k++] = dec2hex[ volume & 0xF ];
+            stringData[k++] = dec2hex[ (volume >> 4) & 0xF ];
+            stringData[k++] = dec2hex[ volume & 0xF ];
         }
         else {
-            str_data[k++]='.';
-            str_data[k++]='.';
+            stringData[k++]='.';
+            stringData[k++]='.';
         }
         
         if (effect) {
-            str_data[k++]='A' + effect;
+            stringData[k++]='A' + effect;
         }
         else {
-            str_data[k++]='.';
+            stringData[k++]='.';
         }
         
         if (parameter) {
-            str_data[k++] = dec2hex[(parameter >> 4) & 0xF];
-            str_data[k++] = dec2hex[parameter & 0xF];
+            stringData[k++] = dec2hex[(parameter >> 4) & 0xF];
+            stringData[k++] = dec2hex[parameter & 0xF];
         }
         else {
-            str_data[k++]='.';
-            str_data[k++]='.';
+            stringData[k++]='.';
+            stringData[k++]='.';
         }
         
-        str_data[k++]=' ';
-        str_data[k++]=' ';
-      
+        stringData[k++]=' ';
+        stringData[k++]=' ';
     }
     
-        printf("%s\n", str_data);
-
-    
-//    NSLog(@"bytesRead: %i", bytesRead);
+    return [[NSString alloc] initWithCString:stringData];
 }
 
 - (NSMutableArray *) getModFileDirectories: (NSString *)modPath {
     NSMutableArray *paths = [[NSMutableArray alloc] init];
     
-    NSString *appUrl      = [[NSBundle mainBundle] bundlePath];
-    NSString *modsUrl     = [appUrl stringByAppendingString:@"/mods"];
+    NSString *appUrl  = [[NSBundle mainBundle] bundlePath];
+    NSString *modsUrl = [appUrl stringByAppendingString:@"/mods"];
     
-    NSURL *directoryUrl   = [[NSURL alloc] initFileURLWithPath:modsUrl];
+    NSURL *directoryUrl = [[NSURL alloc] initFileURLWithPath:modsUrl];
     
     NSFileManager *fileManager = [NSFileManager defaultManager];
     
@@ -391,7 +444,6 @@ void audioCallback(void *data, AudioQueueRef mQueue, AudioQueueBufferRef mBuffer
 
 - (NSMutableArray *) getFilesInDirectory: (NSString*)path {
     NSMutableArray *files = [[NSMutableArray alloc] init];
-    
     
 //    Todo: This is for the Touch 2 app. Be sure to re-enable this.
     NSString *appUrl    = [[NSBundle mainBundle] bundlePath];
